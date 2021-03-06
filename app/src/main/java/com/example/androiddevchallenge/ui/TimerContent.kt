@@ -1,3 +1,18 @@
+/*
+ * Copyright 2021 The Android Open Source Project
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     https://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
 package com.example.androiddevchallenge.ui
 
 import androidx.compose.animation.ExperimentalAnimationApi
@@ -5,7 +20,11 @@ import androidx.compose.animation.animateColorAsState
 import androidx.compose.animation.core.repeatable
 import androidx.compose.animation.core.tween
 import androidx.compose.foundation.background
-import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.padding
 import androidx.compose.material.MaterialTheme
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
@@ -19,9 +38,15 @@ import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewmodel.compose.viewModel
-import com.example.androiddevchallenge.ui.components.*
+import com.example.androiddevchallenge.ui.components.DEFAULT_TIMER_OPTION
+import com.example.androiddevchallenge.ui.components.StartButton
+import com.example.androiddevchallenge.ui.components.StopButton
+import com.example.androiddevchallenge.ui.components.TimeChooser
+import com.example.androiddevchallenge.ui.components.TimerOption
+import com.example.androiddevchallenge.ui.components.TimerView
 import com.example.androiddevchallenge.ui.theme.red500
-import java.util.*
+import java.util.Timer
+import java.util.TimerTask
 
 enum class TimerState {
     IDLE, START, PAUSE
@@ -113,15 +138,18 @@ class TimerViewModel : ViewModel() {
     }
 
     private fun schedule() {
-        timerJob!!.scheduleAtFixedRate(object : TimerTask() {
-            override fun run() {
-                if (_timerValue.value!! <= 0) {
-                    resetTimer()
-                    return
+        timerJob!!.scheduleAtFixedRate(
+            object : TimerTask() {
+                override fun run() {
+                    if (_timerValue.value!! <= 0) {
+                        resetTimer()
+                        return
+                    }
+                    _timerValue.postValue(_timerValue.value!! - 1)
                 }
-                _timerValue.postValue(_timerValue.value!! - 1)
-            }
-        }, 0, 1000)
+            },
+            0, 1000
+        )
     }
 
     fun pauseTimer() {
