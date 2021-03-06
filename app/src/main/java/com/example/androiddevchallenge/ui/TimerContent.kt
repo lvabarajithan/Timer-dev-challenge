@@ -1,17 +1,12 @@
 package com.example.androiddevchallenge.ui
 
-import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.ExperimentalAnimationApi
 import androidx.compose.animation.animateColorAsState
 import androidx.compose.animation.core.repeatable
 import androidx.compose.animation.core.tween
-import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
-import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.material.*
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Stop
+import androidx.compose.material.MaterialTheme
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.livedata.observeAsState
@@ -24,12 +19,8 @@ import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewmodel.compose.viewModel
-import com.example.androiddevchallenge.ui.components.StartButton
-import com.example.androiddevchallenge.ui.components.TimerView
+import com.example.androiddevchallenge.ui.components.*
 import com.example.androiddevchallenge.ui.theme.red500
-import com.example.androiddevchallenge.util.DEFAULT_TIMER_VALUE
-import com.example.androiddevchallenge.util.IDLE_BUTTON_WIDTH
-import com.example.androiddevchallenge.util.STARTED_BUTTON_WIDTH
 import java.util.*
 
 enum class TimerState {
@@ -45,6 +36,7 @@ enum class BlinkState {
 fun TimerContent(viewModel: TimerViewModel = viewModel()) {
     val timerState by viewModel.timerState.observeAsState()
     val timerValue by viewModel.timer.observeAsState()
+    val timerOption by viewModel.timerOption.observeAsState(DEFAULT_TIMER_OPTION)
 
     val blinkState = remember { mutableStateOf(BlinkState.NORMAL) }
     val blinkColor = when (blinkState.value) {
@@ -70,7 +62,8 @@ fun TimerContent(viewModel: TimerViewModel = viewModel()) {
         verticalArrangement = Arrangement.SpaceAround,
         horizontalAlignment = Alignment.CenterHorizontally,
     ) {
-        TimerView(timerValue!!, timerState!!)
+        TimerView(timerOption = timerOption, timerValue = timerValue!!, timerState = timerState!!)
+        TimeChooser(timerState = timerState!!) { viewModel.updateTimerOption(it) }
         Column(
             horizontalAlignment = Alignment.CenterHorizontally,
         ) {
@@ -91,40 +84,25 @@ fun TimerContent(viewModel: TimerViewModel = viewModel()) {
     }
 }
 
-@ExperimentalAnimationApi
-@Composable
-fun StopButton(visible: Boolean, onClick: () -> Unit) {
-    AnimatedVisibility(visible = visible) {
-        OutlinedButton(
-            onClick = onClick,
-            shape = RoundedCornerShape(percent = 50),
-            border = BorderStroke(4.dp, MaterialTheme.colors.secondary),
-            modifier = Modifier
-                .height(STARTED_BUTTON_WIDTH)
-                .width(IDLE_BUTTON_WIDTH),
-            colors = ButtonDefaults.buttonColors(
-                contentColor = MaterialTheme.colors.secondary,
-                backgroundColor = MaterialTheme.colors.background
-            )
-        ) {
-            Icon(imageVector = Icons.Default.Stop, contentDescription = "Stop")
-            Text(text = "Stop")
-        }
-    }
-}
-
-
 class TimerViewModel : ViewModel() {
     private val _timerState = MutableLiveData(TimerState.IDLE)
     val timerState: LiveData<TimerState> = _timerState
 
-    private val _timerValue = MutableLiveData(DEFAULT_TIMER_VALUE)
+    private val _timerValue = MutableLiveData(DEFAULT_TIMER_OPTION.time)
     val timer: LiveData<Int> = _timerValue
+
+    private val _timerOption = MutableLiveData(DEFAULT_TIMER_OPTION)
+    val timerOption: LiveData<TimerOption> = _timerOption
 
     private var timerJob: Timer? = null
 
     fun updateTimerState(state: TimerState) {
         this._timerState.value = state
+    }
+
+    fun updateTimerOption(timerOption: TimerOption) {
+        this._timerOption.value = timerOption
+        this._timerValue.value = timerOption.time
     }
 
     fun startTimer() {
@@ -153,7 +131,7 @@ class TimerViewModel : ViewModel() {
 
     fun resetTimer() {
         pauseTimer()
-        _timerValue.postValue(DEFAULT_TIMER_VALUE)
+        _timerValue.postValue(_timerOption.value!!.time)
         _timerState.postValue(TimerState.IDLE)
     }
 

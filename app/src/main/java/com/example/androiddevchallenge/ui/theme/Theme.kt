@@ -26,16 +26,20 @@ private val DarkColorPalette = darkColors(
     primary = deepPurple200,
     primaryVariant = deepPurple700,
     secondary = pink200,
+    onSecondary = Color.White,
     background = Color.Black,
-    onBackground = Color.White
+    onBackground = Color.White,
+    surface = black700
 )
 
 private val LightColorPalette = lightColors(
     primary = deepPurple500,
     primaryVariant = deepPurple700,
     secondary = pink200,
+    onSecondary = Color.White,
     background = Color.White,
-    onBackground = Color.Black
+    onBackground = Color.Black,
+    surface = Color.White
 )
 
 @Composable

@@ -2,7 +2,10 @@ package com.example.androiddevchallenge.ui.components
 
 import androidx.compose.animation.core.*
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material.Card
 import androidx.compose.material.CircularProgressIndicator
 import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Text
@@ -15,21 +18,31 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.example.androiddevchallenge.ui.TimerState
 import com.example.androiddevchallenge.ui.theme.digital
-import com.example.androiddevchallenge.ui.theme.red500
-import com.example.androiddevchallenge.util.DEFAULT_TIMER_VALUE
 
 @Composable
-fun TimerView(timerValue: Int, timerState: TimerState) {
-    Box(contentAlignment = Alignment.Center) {
-        AnimatedProgress(timerValue, timerState)
-        AnimatedTimerText(timerValue, timerState)
+fun TimerView(timerOption: TimerOption, timerValue: Int, timerState: TimerState) {
+    Card(
+        elevation = 4.dp,
+        shape = RoundedCornerShape(size = 24.dp)
+    ) {
+        Box(contentAlignment = Alignment.Center, modifier = Modifier.padding(24.dp)) {
+            AnimatedProgress(
+                timerOption = timerOption,
+                timerValue = timerValue,
+                timerState = timerState
+            )
+            AnimatedTimerText(
+                timerValue = timerValue,
+                timerState = timerState
+            )
+        }
     }
 }
 
 @Composable
-fun AnimatedProgress(timerValue: Int, timerState: TimerState) {
+fun AnimatedProgress(timerOption: TimerOption, timerValue: Int, timerState: TimerState) {
     val progress =
-        if (timerState == TimerState.IDLE) 1f else timerValue.toFloat() / DEFAULT_TIMER_VALUE
+        if (timerState == TimerState.IDLE) 1f else timerValue.toFloat() / timerOption.time
     val progressVal: Float by animateFloatAsState(
         targetValue = progress,
         animationSpec = tween(durationMillis = 200)

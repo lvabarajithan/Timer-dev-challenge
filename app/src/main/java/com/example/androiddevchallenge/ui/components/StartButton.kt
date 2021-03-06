@@ -29,7 +29,6 @@ import com.example.androiddevchallenge.util.STARTED_BUTTON_WIDTH
 
 @Composable
 fun StartButton(timerState: TimerState, onClick: (TimerState) -> Unit) {
-
     // size anim
     val targetValue = when (timerState) {
         TimerState.START -> STARTED_BUTTON_WIDTH
@@ -37,15 +36,14 @@ fun StartButton(timerState: TimerState, onClick: (TimerState) -> Unit) {
     }
     val animState: Dp by animateDpAsState(
         targetValue = targetValue,
-        animationSpec = tween(durationMillis = 1000),
+        animationSpec = tween(durationMillis = 700),
     )
     OutlinedButton(
         onClick = {
-            val newState: TimerState
-            if (timerState == TimerState.START) {
-                newState = TimerState.PAUSE
+            val newState: TimerState = if (timerState == TimerState.START) {
+                TimerState.PAUSE
             } else {
-                newState = TimerState.START
+                TimerState.START
             }
             onClick(newState)
         },
@@ -59,7 +57,7 @@ fun StartButton(timerState: TimerState, onClick: (TimerState) -> Unit) {
 
 @Composable
 fun StartButtonContent(timerState: TimerState, state: TimerState) {
-    Crossfade(targetState = state, animationSpec = tween(durationMillis = 300, delayMillis = 300)) {
+    Crossfade(targetState = state, animationSpec = tween(durationMillis = 300, delayMillis = 100)) {
         when (state) {
             TimerState.START -> StartedStateContent()
             else -> IdleStateContent(timerState = timerState)
